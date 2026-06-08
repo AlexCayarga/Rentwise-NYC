@@ -3,6 +3,20 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# Data files
+data/raw/*
+data/processed/*
+
+# Keep folder placeholders
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Mac files
+.DS_Store
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
 # C extensions
 *.so
 
