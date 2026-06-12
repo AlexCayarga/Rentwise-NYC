@@ -13,5 +13,5 @@ This project uses NYC apartment listing data to predict fair rent prices and rec
 - Python
 - Pandas
 - Scikit-learn
-- Jupyter Notebook
+- Google Colab
 - GitHub
