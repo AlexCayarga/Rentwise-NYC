@@ -30,22 +30,41 @@ df = df.drop_duplicates(subset=["listing_id"])
 # Adding borough column
 boroughs = gpd.read_file("data/raw/Borough_Boundaries_20260729.geojson")
 
-apartments = gpd.GeoDataFrame(
-    df,
+geo_df = gpd.GeoDataFrame(
+    df.copy(),
     geometry=gpd.points_from_xy(df["longitude"], df["latitude"]),
     crs="EPSG:4326"
 )
 
-apartments = gpd.sjoin(
-    apartments,
-    boroughs,
+boroughs = boroughs.to_crs(geo_df.crs)
+
+print(boroughs.columns)
+print(boroughs.drop(columns="geometry").head())
+
+geo_df = gpd.sjoin(
+    geo_df,
+    boroughs[["boroname", "geometry"]],
     how="left",
-    predicate="within"
+   predicate="within"
 )
+
+geo_df = geo_df.rename(columns={"boroname": "borough"})
+
+print(geo_df[[
+    "listing_id",
+    "latitude",
+    "longitude",
+    "borough"
+]].head())
+
+print(geo_df["borough"].value_counts(dropna=False))
+
+df = geo_df.drop(columns=["geometry", "index_right"])
+
+df = df.dropna(subset=["borough"]).copy()
 
 # Save cleaned data
 output_path = project_root / "data" / "processed" / "completely_cleaned_train.csv"
 df.to_csv(output_path, index=False)
 
-#print("Saved cleaned data to:", output_path)
 print(df.shape)
