@@ -1,4 +1,5 @@
 import pandas as pd
+import geopandas as gpd
 from pathlib import Path
 
 project_root = Path(__file__).resolve().parents[1]
@@ -25,6 +26,22 @@ df = df[
 df["num_features"] = df["num_features"].clip(upper=20)        
 df = df.drop(columns= "price_per_bedroom")
 df = df.drop_duplicates(subset=["listing_id"])
+
+# Adding borough column
+boroughs = gpd.read_file("data/raw/Borough_Boundaries_20260729.geojson")
+
+apartments = gpd.GeoDataFrame(
+    df,
+    geometry=gpd.points_from_xy(df["longitude"], df["latitude"]),
+    crs="EPSG:4326"
+)
+
+apartments = gpd.sjoin(
+    apartments,
+    boroughs,
+    how="left",
+    predicate="within"
+)
 
 # Save cleaned data
 output_path = project_root / "data" / "processed" / "completely_cleaned_train.csv"
